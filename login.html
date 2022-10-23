@@ -8,12 +8,46 @@
 </head>
 <body>
     <h2>Login Page</h2><br>
-    <form action="http://localhost:3000/login" method="post">
-        <label for="login">Login</label><br>
-        <input type="text" name="login" id="login" autocomplete="off"><br>
+    <!-- <form action="http://localhost:3000/authentication" method="post"> -->
+    <form action="" method="post">
+        <label for="username">Username</label><br>
+        <input type="text" name="username" id="username" autocomplete="off"><br>
         <label for="password">Password</label><br>
         <input type="password" name="password" id="password" autocomplete="off"><br><br>
-        <input type="submit" value="Submit">
+        <button type="submit" id="submit">Submit</button>
     </form>
+
+    <script>
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const submit = document.getElementById('submit');
+
+        console.log('client ok');
+
+
+        submit.addEventListener('click',function(e){
+            e.preventDefault();
+            console.log(username.value);
+            console.log(password.value); 
+            let coded = btoa(`${username.value}:${password.value}`);
+            console.log(coded);
+            console.log(atob(coded));
+
+            const request = fetch('http://localhost:3000/authentication', { 
+                method: 'post', 
+                headers: new Headers({
+                    'Authorization': 'Basic '+btoa(`${username.value}:${password.value}`), 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }), 
+                body: 'A=1&B=2'
+            })
+            .then(response=>response.json())
+            .then(data=>{ console.log(data); });
+            
+            
+            
+            
+        })
+    </script>
 </body>
 </html>
