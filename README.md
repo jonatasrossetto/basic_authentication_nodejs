@@ -10,6 +10,9 @@ not exists the server tests de data sent by client if ok, creates an encoded coo
 if the cookie exists the the server will test its validity.
 
 next tasks
+- server/client implement try/catch structures to error handling
+- client login data validation before send to server
+- client display server message within login page
 - server implements an app page end point with the cookie testing policy
 - client remove javascript code from the login html file
 - server/client refactor the authentication endpoint using specific methods
