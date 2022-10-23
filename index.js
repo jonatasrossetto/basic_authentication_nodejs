@@ -56,8 +56,8 @@ app.post('/authentication',function(req,res){
                 //Correct username and password given
                 console.log("WELCOME ADMIN");
                 //Store a cookie with name=user and value=username
-                // res.cookie('user', 'admin', {signed: true});
-                // res.send("Signed in the first time");
+                res.cookie('user', 'admin', {signed: true});
+                res.send({ message: 'Signed in the first time' });
             }
             else
             {
@@ -67,5 +67,20 @@ app.post('/authentication',function(req,res){
             }
         }
     }
+    else
+    {//Signed cookie already stored
+        if(req.signedCookies.user=='admin')
+        {
+            console.log('The cookie info is OK');
+            res.send({message:'The cookie info is OK'});
+        }
+        else
+        {
+            //Wrong info, user asked to authenticate again
+            console.log('Wrong cookie authentication data');
+            res.send({message:'Wrong cookie authentication data'});
+        }
+    }
 })
+
 
