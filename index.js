@@ -11,6 +11,36 @@ app.use(bodyParser.urlencoded({extended:true}));
 // apply cookie-parser to incomming calls and decode using the secre key
 app.use(cookieParser('secret_key'));
 
+let users = [
+    {
+      userId: 1,
+      name:"João Neves",
+      login:"joao",
+      password:"123",
+      active:false
+    },
+    {
+      userId: 2,
+      name:"Maria Silva",
+      login:"maria",
+      password:"123",
+      active:false
+    },
+    {
+        userId: 3,
+      name:"José Costa",
+      login:"jose",
+      password:"123",
+      active:false
+    },
+    {
+        userId: 4,
+      name:"Jorge Bonfim",
+      login:"jorge",
+      password:"123",
+      active:false
+    }
+  ];
 
 // start the server to listen on port 3000
 app.listen(3000, function(){
@@ -20,8 +50,19 @@ app.listen(3000, function(){
 // set the landing page
 app.get('/',function(req,res){
     console.log('landing page');
-    // res.status(200).send('hey from the server side');
-    res.sendFile(__dirname +'/login.html');
+    
+    let cookieStuff=req.signedCookies.user;
+    console.log('cookieStuff:');
+    console.log(cookieStuff);
+    
+    if (validCookieData(cookieStuff))//True for our case
+    {
+        // res.status(200).send('hey from the server side');
+        res.sendFile(__dirname +'/appWelcome.html');
+    } else {
+        // res.status(200).send('hey from the server side');
+        res.sendFile(__dirname +'/login.html');
+    }
 })
 
 // endpoint to implement basic authentication
@@ -46,31 +87,28 @@ app.post('/authentication',function(req,res){
         else
         {
             console.log('first else:test authorization info');
-            step1=new Buffer.from(authStuff.split(" ")[1], 'base64');
-            console.log(step1);
-            //Extracting username:password from the encoding Authorization: Basic username:password
-            step2=step1.toString().split(":");
-            console.log(step2);
+            const authData = recoverAuthenticationData(authStuff);
+            console.log(authData);
+            const authIsValid = checkUserData(authData.username, authData.password);
+            console.log(authIsValid.error + ' : ' + authIsValid.msg + ' : ' + authIsValid.username);
             //Extracting the username and password in an array
-            if(step2[0]=='adm' && step2[1]=='123') 
+            if(!authIsValid.error) 
             {
-                //Correct username and password given
-                console.log("WELCOME ADMIN");
-                //Store a cookie with name=user and value=username
-                res.cookie('user', 'admin', {signed: true});
+                console.log("WELCOME "+authIsValid.name);
+                res.cookie('user', {id:authIsValid.id,name:authIsValid.name}, {signed: true});
                 res.send({ message: 'Signed in the first time' });
             }
             else
             {
                 //Wrong authentication info, retry
                 console.log('last else: Wrong authentication info, retry');
-                res.send({ message: 'all wrong' });
+                res.send({ message: authIsValid.msg });
             }
         }
     }
     else
     {//Signed cookie already stored
-        if(req.signedCookies.user=='admin')
+        if(validCookieData(cookieStuff))
         {
             console.log('The cookie info is OK');
             res.send({message:'The cookie info is OK'});
@@ -89,54 +127,40 @@ app.post('/authentication',function(req,res){
 const recoverAuthenticationData = function(receivedAuthenticationData){
     // recover authenticationData from base64
     const authenticationData=new Buffer.from(receivedAuthenticationData.split(" ")[1], 'base64');
-    console.log(authenticationData);
-    //Extracting username:password from the encoding Authorization: Basic username:password
-    // const userName = authenticationData.toString().split(":")[0];
-    // const passWord = authenticationData.toString().split(":")[1];
-    // console.log(username+' : '+password);
-    return { 
-                username: authenticationData.toString().split(":")[0],
-                password: authenticationData.toString().split(":")[1] 
-            }
+    return {    username: authenticationData.toString().split(":")[0],
+                password: authenticationData.toString().split(":")[1] }
 }
 
 const checkUserData = function (username, password){
-    let users = [
-        {
-          name:"João Neves",
-          login:"joao",
-          password:"123",
-          active:false
-        },
-        {
-          name:"Maria Silva",
-          login:"maria",
-          password:"123",
-          active:false
-        },
-        {
-          name:"José Costa",
-          login:"jose",
-          password:"123",
-          active:false
-        },
-        {
-          name:"Jorge Bonfim",
-          login:"jorge",
-          password:"123",
-          active:false
-        }
-      ];
+    console.log('checkUserData');
     for (const user of users){
+        console.log(user);
         if ((user.login===username)&&(user.password===password)) {
+            console.log(user.login);
             if (user.active===false) {
                 user.active=true;
-                return {error: false, msg: ''};
+                return {error: false, msg: '', id: user.userId, username: user.login, name: user.name};
             } else {
-                return {error: true, msg: 'user already active'};
+                return {error: true, msg: 'user already active', id: '', username: '', name: ''};
             }
-        } else {
-            return {error: true, msg: 'error: login or password incorrect'};
+        } 
+    }
+    return {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+}
+
+const validCookieData = function (cookieData){
+    if (cookieData) {
+        const id = cookieData.id;
+        console.log('id: '+id);
+        for (const user of users) {
+            console.log(user.userId);
+            console.log(user.active);
+            if (user.userId===Number(id)&&user.active===true){
+                console.log('cookie true');
+                return true;
+            }
         }
     }
+    console.log('cookie false');
+    return false;
 }
