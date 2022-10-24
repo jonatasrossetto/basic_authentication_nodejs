@@ -41,6 +41,7 @@ app.post('/authentication',function(req,res){
         {
             //No authentication info given
             console.log('no authentication info given');
+            res.send({ message: 'No authentication info was sent to server' });
         }
         else
         {
@@ -84,3 +85,58 @@ app.post('/authentication',function(req,res){
 })
 
 
+
+const recoverAuthenticationData = function(receivedAuthenticationData){
+    // recover authenticationData from base64
+    const authenticationData=new Buffer.from(receivedAuthenticationData.split(" ")[1], 'base64');
+    console.log(authenticationData);
+    //Extracting username:password from the encoding Authorization: Basic username:password
+    // const userName = authenticationData.toString().split(":")[0];
+    // const passWord = authenticationData.toString().split(":")[1];
+    // console.log(username+' : '+password);
+    return { 
+                username: authenticationData.toString().split(":")[0],
+                password: authenticationData.toString().split(":")[1] 
+            }
+}
+
+const checkUserData = function (username, password){
+    let users = [
+        {
+          name:"João Neves",
+          login:"joao",
+          password:"123",
+          active:false
+        },
+        {
+          name:"Maria Silva",
+          login:"maria",
+          password:"123",
+          active:false
+        },
+        {
+          name:"José Costa",
+          login:"jose",
+          password:"123",
+          active:false
+        },
+        {
+          name:"Jorge Bonfim",
+          login:"jorge",
+          password:"123",
+          active:false
+        }
+      ];
+    for (const user of users){
+        if ((user.login===username)&&(user.password===password)) {
+            if (user.active===false) {
+                user.active=true;
+                return {error: false, msg: ''};
+            } else {
+                return {error: true, msg: 'user already active'};
+            }
+        } else {
+            return {error: true, msg: 'error: login or password incorrect'};
+        }
+    }
+}
