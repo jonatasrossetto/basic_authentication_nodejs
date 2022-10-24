@@ -122,6 +122,21 @@ app.post('/authentication',function(req,res){
     }
 })
 
+app.get('/appWelcome',function(req,res){
+    console.log('trying to go to appWelcome page');
+    let cookieStuff=req.signedCookies.user;
+    console.log('cookieStuff:');
+    console.log(cookieStuff);
+    if (validCookieData(cookieStuff))//True for our case
+    {
+        // res.status(200).send('hey from the server side');
+        console.log('hey hey appWelcome');
+        res.sendFile(__dirname +'/appWelcome.html');
+    } else {
+        // res.status(200).send('hey from the server side');
+        res.sendFile(__dirname +'/login.html');
+    }
+});
 
 
 const recoverAuthenticationData = function(receivedAuthenticationData){
