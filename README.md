@@ -13,9 +13,10 @@ next tasks
 - server/client implement try/catch structures to error handling
 - client login data validation before send to server
 - client display server message within login page
-- <ok>server implements an app page end point with the cookie testing policy
-- <ok>client remove javascript code from the login html file
-- <+/-> server/client refactor the authentication endpoint using specific methods
+- OK server implements an app page end point with the cookie testing policy
+- OK client remove javascript code from the login html file
+- +/- server/client refactor the authentication endpoint using specific methods
 - server looks for user login data in a database
 - server/client implements a sign on page and link it to a server database
 - server implement a log for all authentication events
+- use typescript
