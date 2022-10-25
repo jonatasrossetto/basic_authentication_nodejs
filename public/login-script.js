@@ -1,6 +1,7 @@
 const username = document.getElementById('username');
         const password = document.getElementById('password');
         const submit = document.getElementById('submit');
+        const serverMessage = document.querySelector('.server-message');
 
         console.log('client ok');
 
@@ -24,6 +25,7 @@ const username = document.getElementById('username');
             .then(response=>response.json())
             .then(data=>{ 
                 console.log(data.message);
+                serverMessage.textContent=data.message;
                 if (data.message==='Signed in the first time'){
                     console.log('ok');
                     window.location.href = "http://localhost:3000/appWelcome";

@@ -95,7 +95,11 @@ app.post('/authentication',function(req,res){
             if(!authIsValid.error) 
             {
                 console.log("WELCOME "+authIsValid.name);
-                res.cookie('user', {id:authIsValid.id,name:authIsValid.name}, {signed: true});
+                let expireDate = new Date(Date.now()+60*1000);
+                console.log('expire date:' + expireDate);
+                res.cookie('user', {id:authIsValid.id,name:authIsValid.name}, 
+                {signed: true,
+                expires:expireDate});
                 res.send({ message: 'Signed in the first time' });
             }
             else
