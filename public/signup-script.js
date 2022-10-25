@@ -15,6 +15,19 @@ submit.addEventListener('click',function(e){
         if (password.value==confirmPassword.value){
             console.log('password confirmed');
             message.textContent='password confirmed';
+            const request = fetch('http://localhost:3000/register', { 
+                method: 'post', 
+                body: JSON.stringify({
+                    name: name.value,
+                    username: username.value,
+                    password: password.value
+            }),
+            // Adding headers to the request
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }}).then(function(response){
+                console.log(response.json());
+            });
         } else {
             console.log('failed to confirm password');
             message.textContent='failed to confirm password';

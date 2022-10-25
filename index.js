@@ -10,6 +10,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended:true}));
 // apply cookie-parser to incomming calls and decode using the secre key
 app.use(cookieParser('secret_key'));
+app.use(express.json());
 
 let users = [
     {
@@ -157,6 +158,22 @@ app.get('/signup',function(req,res){
         res.sendFile(__dirname +'/signup.html');
     }
 });
+
+app.post('/register',function(req,res){
+    console.log('register service');
+    let cookieStuff=req.signedCookies.user;
+    console.log('cookieStuff:');
+    console.log(cookieStuff);
+    if (validCookieData(cookieStuff))//True for our case
+    {
+        console.log('hey hey appWelcome');
+        res.sendFile(__dirname +'/appWelcome.html');
+    } else {
+        console.log(req.body);
+        res.send({message: 'register data received'});
+    }
+});
+
 
 
 const recoverAuthenticationData = function(receivedAuthenticationData){
