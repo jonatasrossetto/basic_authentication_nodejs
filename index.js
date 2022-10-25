@@ -169,7 +169,18 @@ app.post('/register',function(req,res){
         console.log('hey hey appWelcome');
         res.sendFile(__dirname +'/appWelcome.html');
     } else {
-        console.log(req.body);
+        console.log('name: '+req.body.name);
+        console.log('username: '+req.body.username);
+        console.log('password: '+req.body.password);
+        console.log('last user id: '+users[users.length-1].userId);
+        users.push({
+            userId: users[users.length-1].userId+1,
+            name:req.body.name,
+            login:req.body.username,
+            password:req.body.password,
+            active:false
+        })
+        console.log(users);
         res.send({message: 'register data received'});
     }
 });
