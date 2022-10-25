@@ -18,6 +18,6 @@ next tasks
 - OK client remove javascript code from the login html file
 - +/- server/client refactor the authentication endpoint using specific methods
 - server looks for user login data in a database
-- server/client implements a sign on page and link it to a server database
+- OK server/client implements a sign on page and link it to a server database
 - server implement a log for all authentication events
 - use typescript
