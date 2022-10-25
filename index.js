@@ -142,6 +142,22 @@ app.get('/appWelcome',function(req,res){
     }
 });
 
+app.get('/signup',function(req,res){
+    console.log('signup page');
+    let cookieStuff=req.signedCookies.user;
+    console.log('cookieStuff:');
+    console.log(cookieStuff);
+    if (validCookieData(cookieStuff))//True for our case
+    {
+        // res.status(200).send('hey from the server side');
+        console.log('hey hey appWelcome');
+        res.sendFile(__dirname +'/appWelcome.html');
+    } else {
+        // res.status(200).send('hey from the server side');
+        res.sendFile(__dirname +'/signup.html');
+    }
+});
+
 
 const recoverAuthenticationData = function(receivedAuthenticationData){
     // recover authenticationData from base64
