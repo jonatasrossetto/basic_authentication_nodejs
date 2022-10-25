@@ -10,26 +10,33 @@ const username = document.getElementById('username');
             e.preventDefault();
             console.log(username.value);
             console.log(password.value); 
-            let coded = btoa(`${username.value}:${password.value}`);
-            console.log(coded);
-            console.log(atob(coded));
+            if (username.value.indexOf(':')<0&&password.value.indexOf(':')<0){
+                let coded = btoa(`${username.value}:${password.value}`);
+                console.log(coded);
+                console.log(atob(coded));
+    
+                const request = fetch('http://localhost:3000/authentication', { 
+                    method: 'post', 
+                    headers: new Headers({
+                        'Authorization': 'Basic '+btoa(`${username.value}:${password.value}`), 
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }), 
+                    body: 'A=1&B=2'
+                })
+                .then(response=>response.json())
+                .then(data=>{ 
+                    console.log(data.message);
+                    serverMessage.textContent=data.message;
+                    if (data.message==='Signed in the first time'){
+                        console.log('ok');
+                        window.location.href = "http://localhost:3000/appWelcome";
+                    }
+                 });
+    
+            } else {
+                serverMessage.textContent='username and password should not contain ":"';
+            }
 
-            const request = fetch('http://localhost:3000/authentication', { 
-                method: 'post', 
-                headers: new Headers({
-                    'Authorization': 'Basic '+btoa(`${username.value}:${password.value}`), 
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }), 
-                body: 'A=1&B=2'
-            })
-            .then(response=>response.json())
-            .then(data=>{ 
-                console.log(data.message);
-                serverMessage.textContent=data.message;
-                if (data.message==='Signed in the first time'){
-                    console.log('ok');
-                    window.location.href = "http://localhost:3000/appWelcome";
-                }
-             });
 
+            
         })
