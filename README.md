@@ -11,7 +11,7 @@ if the cookie exists the the server will test its validity.
 
 next tasks
 - server/client implement try/catch structures to error handling
-- client login data validation before send to server
+- OK client login data validation before send to server (must not contain ":")
 - OK client display server message within login page
 - OK cookie expires after a pre-set period
 - OK server implements an app page end point with the cookie testing policy
