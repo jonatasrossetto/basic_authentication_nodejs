@@ -184,6 +184,19 @@ app.post('/register',function(req,res){
     }
 });
 
+app.post('/userInfo',function(req,res){
+    console.log('userInfo');
+    let cookieStuff=req.signedCookies.user;
+    console.log('cookieStuff:');
+    console.log(cookieStuff.id);
+    if (validCookieData(cookieStuff))//True for our case
+    {
+        res.send({message: 'here goes the user requested user info'});
+    } else {
+        res.sendFile(__dirname +'/login.html');
+    }
+});
+
 
 
 const recoverAuthenticationData = function(receivedAuthenticationData){
