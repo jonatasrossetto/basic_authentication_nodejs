@@ -4,6 +4,34 @@ const cookieParser=require('cookie-parser')
 
 const app = express();
 
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'usersauthentication'
+});
+connection.connect((err) => {
+  if (err) throw err;
+  console.log('Connected!');
+});
+
+connection.query('SELECT * FROM users', (err,rows) => {
+    if(err) throw err;
+    console.log('Data received from Db:');
+    console.log(rows);
+  });
+
+  connection.query("SELECT * FROM users WHERE login='joao'", (err,rows) => {
+    if(err) throw err;
+    console.log('Data received from Db:');
+    console.log('name: '+rows[0].name);
+    console.log('login: '+rows[0].login);
+    console.log('password: '+rows[0].password);
+    console.log('active: '+rows[0].active);
+  });
+
+
 // inform the public directory for node.js
 app.use(express.static(__dirname + '/public'));
 // apply bodyParser to all incomming calls
