@@ -4,35 +4,47 @@ const cookieParser=require('cookie-parser')
 
 const app = express();
 
-const mysql = require('mysql');
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'usersauthentication'
-});
-connection.connect((err) => {
-  if (err) throw err;
-  console.log('Connected!');
-});
 
-connection.query('SELECT * FROM users', (err,rows) => {
-    if(err) throw err;
-    console.log('Data received from Db:');
-    console.log(rows);
-  });
+(async () => {
+    console.log('antes');
+    const db = require("./db");
+    console.log('Começou!');
 
-  connection.query("SELECT * FROM users WHERE login='joao'", (err,rows) => {
-    if(err) throw err;
-    console.log('Data received from Db:');
-    console.log('name: '+rows[0].name);
-    console.log('login: '+rows[0].login);
-    console.log('password: '+rows[0].password);
-    console.log('active: '+rows[0].active);
-  });
+    console.log('SELECT * FROM USERS');
+    const usuarios = await db.getUsers();
+    console.log(usuarios);
+    console.log('depois');
+})();
+
+
+// const mysql = require('mysql2/promise');
+// const connection = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'usersauthentication'
+// });
+// connection.connect((err) => {
+//   if (err) throw err;
+//   console.log('Connected!');
+// });
+
+// async function getData(){
+//     const [ data ] = (await connection).query('SELECT * FROM users');
+//     return data;
+// }
+// getData().then(function(response){
+//     console.log(response);
+// });
+
+
+
+
+
 
 
 // inform the public directory for node.js
+
 app.use(express.static(__dirname + '/public'));
 // apply bodyParser to all incomming calls
 app.use(bodyParser.urlencoded({extended:true}));
@@ -234,7 +246,7 @@ const recoverAuthenticationData = function(receivedAuthenticationData){
                 password: authenticationData.toString().split(":")[1] }
 }
 
-const checkUserData = function (username, password){
+const checkUserDataOld = function (username, password){
     console.log('checkUserData');
     for (const user of users){
         console.log(user);
@@ -249,6 +261,24 @@ const checkUserData = function (username, password){
         } 
     }
     return {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+}
+
+const checkUserData = function (username, password){
+    console.log('checkUserData with mysql database');
+    let msg = {error: true, msg: '', id: '', username: '', name: ''};
+    connection.query(`SELECT * FROM users WHERE login='${username}'`, (err,rows) => {
+        if(err) throw err;
+        if (rows.length>0&&rows[0].senha===password) {
+            console.log('password is ok');
+            msg = {error: false, msg: '', id: rows[0].id, username: rows[0].login, name: rows[0].name};
+            
+        } else {
+            console.log('login not found within DB');
+            msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+        }
+    })
+    console.log(msg);
+    return msg;
 }
 
 const validCookieData = function (cookieData){
