@@ -5,16 +5,16 @@ const cookieParser=require('cookie-parser')
 const app = express();
 
 
-(async () => {
-    console.log('antes');
-    const db = require("./db");
-    console.log('Começou!');
+// (async () => {
+//     console.log('antes');
+//     const db = require("./db");
+//     console.log('Começou!');
 
-    console.log('SELECT * FROM USERS');
-    const usuarios = await db.getUsers();
-    console.log(usuarios);
-    console.log('depois');
-})();
+//     console.log('SELECT * FROM USERS');
+//     const usuarios = await db.getUsers();
+//     console.log(usuarios);
+//     console.log('depois');
+// })();
 
 
 // const mysql = require('mysql2/promise');
@@ -111,6 +111,7 @@ app.post('/authentication',function(req,res){
     console.log('authentication in progress');
     // stores the data from the cookie user, if it exists, deconding it
     let cookieStuff=req.signedCookies.user;
+    let authIsValid;
     console.log('cookieStuff:');
     console.log(cookieStuff);
     //But the user is logging in for the first time so there won't be any appropriate signed cookie for usage.
@@ -130,25 +131,29 @@ app.post('/authentication',function(req,res){
             console.log('first else:test authorization info');
             const authData = recoverAuthenticationData(authStuff);
             console.log(authData);
-            const authIsValid = checkUserData(authData.username, authData.password);
-            console.log(authIsValid.error + ' : ' + authIsValid.msg + ' : ' + authIsValid.username);
-            //Extracting the username and password in an array
-            if(!authIsValid.error) 
-            {
-                console.log("WELCOME "+authIsValid.name);
-                let expireDate = new Date(Date.now()+60*1000);
-                console.log('expire date:' + expireDate);
-                res.cookie('user', {id:authIsValid.id,name:authIsValid.name}, 
-                {signed: true,
-                expires:expireDate});
-                res.send({ message: 'Signed in the first time' });
-            }
-            else
-            {
-                //Wrong authentication info, retry
-                console.log('last else: Wrong authentication info, retry');
-                res.send({ message: authIsValid.msg });
-            }
+            (async () => {
+                const db = require("./db");
+                console.log('begin checkUserData');
+                authIsValid = await db.checkUserData(authData.username, authData.password);
+                // console.log('authIsValid');
+                // console.log(authIsValid.error);
+                console.log('end checkUserData');
+                //Extracting the username and password in an array
+                if(!authIsValid.error) 
+                {
+                    console.log("WELCOME "+authIsValid.name);
+                    let expireDate = new Date(Date.now()+60*1000);
+                    console.log('expire date:' + expireDate);
+                    res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate});
+                    res.send({ message: 'Signed in the first time' });
+                }
+                else
+                {
+                    //Wrong authentication info, retry
+                    console.log('last else: Wrong authentication info, retry');
+                    res.send({ message: authIsValid.msg });
+                }
+            })();
         }
     }
     else
@@ -263,23 +268,23 @@ const checkUserDataOld = function (username, password){
     return {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
 }
 
-const checkUserData = function (username, password){
-    console.log('checkUserData with mysql database');
-    let msg = {error: true, msg: '', id: '', username: '', name: ''};
-    connection.query(`SELECT * FROM users WHERE login='${username}'`, (err,rows) => {
-        if(err) throw err;
-        if (rows.length>0&&rows[0].senha===password) {
-            console.log('password is ok');
-            msg = {error: false, msg: '', id: rows[0].id, username: rows[0].login, name: rows[0].name};
+// const checkUserData = function (username, password){
+//     console.log('checkUserData with mysql database');
+//     let msg = {error: true, msg: '', id: '', username: '', name: ''};
+//     connection.query(`SELECT * FROM users WHERE login='${username}'`, (err,rows) => {
+//         if(err) throw err;
+//         if (rows.length>0&&rows[0].senha===password) {
+//             console.log('password is ok');
+//             msg = {error: false, msg: '', id: rows[0].id, username: rows[0].login, name: rows[0].name};
             
-        } else {
-            console.log('login not found within DB');
-            msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
-        }
-    })
-    console.log(msg);
-    return msg;
-}
+//         } else {
+//             console.log('login not found within DB');
+//             msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+//         }
+//     })
+//     console.log(msg);
+//     return msg;
+// }
 
 const validCookieData = function (cookieData){
     if (cookieData) {
