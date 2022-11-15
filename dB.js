@@ -29,7 +29,7 @@ async function checkUserData(username, password) {
     if (rows.length>0){
         // console.log('checkUserData rows:');
         // console.log(rows.length);
-        // const userData = rows.pop();
+        const userData = rows.pop();
         // console.log(userData.senha);
         // console.log(password);
         // console.log(userData.senha==password);
@@ -47,4 +47,27 @@ async function checkUserData(username, password) {
     return msg;
 }
 
-module.exports = {getUsers, checkUserData}
+
+async function validCookieData(cookieData) {
+    console.log('validCookieData with mysql database');
+    const conn = await connect();
+    if (cookieData) {
+        const id = cookieData.id;
+        console.log('id: '+id);
+        const [rows] = await conn.query(`SELECT * FROM users WHERE id='${id}'`);
+        if (rows.length>0){
+            const userData = rows.pop();
+            console.log(userData.userId);
+            console.log(userData.active);
+            if (userData.userId===Number(id)&&userData.active===true){
+                console.log('cookie true');
+                return true;
+            }
+        }
+    }
+    console.log('cookie false');
+    return false;
+}
+
+
+module.exports = {getUsers, checkUserData, validCookieData}

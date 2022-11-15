@@ -96,14 +96,35 @@ app.get('/',function(req,res){
     console.log('cookieStuff:');
     console.log(cookieStuff);
     
-    if (validCookieData(cookieStuff))//True for our case
-    {
-        // res.status(200).send('hey from the server side');
-        res.sendFile(__dirname +'/appWelcome.html');
+    if (cookieStuff){
+        (async () => {
+            const db = require("./db");
+            console.log('begin validCookieData');
+            const cookieIsValid = await db.validCookieData(cookieStuff);
+            if(cookieIsValid) {
+                console.log('The cookie info is OK');
+                res.sendFile(__dirname +'/appWelcome.html');
+            } else {
+                //Wrong info, user asked to authenticate again
+                console.log('Wrong cookie authentication data');
+                res.sendFile(__dirname +'/login.html');
+            }
+        })
     } else {
-        // res.status(200).send('hey from the server side');
+        console.log('There is no cookie authentication data');
         res.sendFile(__dirname +'/login.html');
     }
+    
+
+
+    // if (validCookieData(cookieStuff))//True for our case
+    // {
+    //     // res.status(200).send('hey from the server side');
+    //     res.sendFile(__dirname +'/appWelcome.html');
+    // } else {
+    //     // res.status(200).send('hey from the server side');
+    //     res.sendFile(__dirname +'/login.html');
+    // }
 })
 
 // endpoint to implement basic authentication
@@ -158,17 +179,18 @@ app.post('/authentication',function(req,res){
     }
     else
     {//Signed cookie already stored
-        if(validCookieData(cookieStuff))
-        {
-            console.log('The cookie info is OK');
-            res.send({message:'The cookie info is OK'});
-        }
-        else
-        {
-            //Wrong info, user asked to authenticate again
-            console.log('Wrong cookie authentication data');
-            res.send({message:'Wrong cookie authentication data'});
-        }
+        (async () => {
+            const db = require("./db");
+            console.log('begin validCookieData');
+            if(validCookieData(cookieStuff)) {
+                console.log('The cookie info is OK');
+                res.send({message:'The cookie info is OK'});
+            } else {
+                //Wrong info, user asked to authenticate again
+                console.log('Wrong cookie authentication data');
+                res.send({message:'Wrong cookie authentication data'});
+            }
+        })
     }
 })
 
@@ -177,16 +199,24 @@ app.get('/appWelcome',function(req,res){
     let cookieStuff=req.signedCookies.user;
     console.log('cookieStuff:');
     console.log(cookieStuff);
-    if (validCookieData(cookieStuff))//True for our case
-    {
-        // res.status(200).send('hey from the server side');
-        console.log('hey hey appWelcome');
-        res.sendFile(__dirname +'/appWelcome.html');
-    } else {
-        // res.status(200).send('hey from the server side');
-        res.sendFile(__dirname +'/login.html');
-    }
-});
+    if (cookieStuff){
+            console.log('begin validCookieData');
+            const db = require("./db");
+            const cookieIsValid = db.validCookieData(cookieStuff);
+            console.log('cookieIsValid: '+cookieIsValid);
+            if(cookieIsValid) {
+                console.log('The cookie info is OK');
+                res.sendFile(__dirname +'/appWelcome.html');
+            } else {
+                //Wrong info, user asked to authenticate again
+                console.log('Wrong cookie authentication data');
+                res.sendFile(__dirname +'/login.html');
+            }
+        } else {
+            console.log('There is no cookie authentication data');
+            res.sendFile(__dirname +'/login.html');
+        }
+    });
 
 app.get('/signup',function(req,res){
     console.log('signup page');
@@ -229,18 +259,18 @@ app.post('/register',function(req,res){
     }
 });
 
-app.post('/userInfo',function(req,res){
-    console.log('userInfo');
-    let cookieStuff=req.signedCookies.user;
-    console.log('cookieStuff:');
-    console.log(cookieStuff.id);
-    if (validCookieData(cookieStuff))//True for our case
-    {
-        res.send({message: 'here goes the user requested user info'});
-    } else {
-        res.sendFile(__dirname +'/login.html');
-    }
-});
+// app.post('/userInfo',function(req,res){
+//     console.log('userInfo');
+//     let cookieStuff=req.signedCookies.user;
+//     console.log('cookieStuff:');
+//     console.log(cookieStuff.id);
+//     if (validCookieData(cookieStuff))//True for our case
+//     {
+//         res.send({message: 'here goes the user requested user info'});
+//     } else {
+//         res.sendFile(__dirname +'/login.html');
+//     }
+// });
 
 
 
@@ -286,22 +316,22 @@ const checkUserDataOld = function (username, password){
 //     return msg;
 // }
 
-const validCookieData = function (cookieData){
-    if (cookieData) {
-        const id = cookieData.id;
-        console.log('id: '+id);
-        for (const user of users) {
-            console.log(user.userId);
-            console.log(user.active);
-            if (user.userId===Number(id)&&user.active===true){
-                console.log('cookie true');
-                return true;
-            }
-        }
-    }
-    console.log('cookie false');
-    return false;
-}
+// const validCookieData = function (cookieData){
+//     if (cookieData) {
+//         const id = cookieData.id;
+//         console.log('id: '+id);
+//         for (const user of users) {
+//             console.log(user.userId);
+//             console.log(user.active);
+//             if (user.userId===Number(id)&&user.active===true){
+//                 console.log('cookie true');
+//                 return true;
+//             }
+//         }
+//     }
+//     console.log('cookie false');
+//     return false;
+// }
 
 const newUsernameIsValid = function(newUsername){
     console.log('newUsernameIsValid');
