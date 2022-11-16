@@ -5,6 +5,14 @@ const confirmPassword = document.getElementById('confirm-password');
 const submit = document.getElementById('submit');
 const message = document.getElementById('message');
 
+newName.addEventListener('click',()=>{
+    message.textContent='';
+    newName.value='';
+    username.value='';
+    password.value='';
+    confirmPassword.value='';
+})
+
 submit.addEventListener('click',function(e){
     e.preventDefault();
     if (newName.value.length>=3&&password.value.length>=3&&username.value.length>=3){
@@ -26,7 +34,7 @@ submit.addEventListener('click',function(e){
                 .then(data=>{
                     message.textContent = data.message;
                     if (data.message=='new user created') {
-                        
+                        window.location.href = 'http://localhost:3000/';    
                     }
                     console.log(data.message);
                 });

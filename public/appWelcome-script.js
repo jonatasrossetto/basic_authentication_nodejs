@@ -1,4 +1,5 @@
 const welcomeMessage = document.getElementById("welcome-message")
+const btnLogout = document.querySelector(".btn-logout");
 
 const request = fetch('http://localhost:3000/userInfo', { 
                     method: 'post', 
@@ -11,5 +12,13 @@ const request = fetch('http://localhost:3000/userInfo', {
                 .then(data=>{
                     welcomeMessage.textContent = `${data.message}, welcome to the App`; 
                 });
+
+btnLogout.addEventListener('click',()=>{
+    console.log('removing coookie');
+    console.log(document.cookie);
+    document.cookie='user=';
+    window.location.href = 'http://localhost:3000/'
+    console.log(document.cookie);
+})
 
 // welcomeMessage.textContent="Hello Jonatas, this is the App Welcome Page";

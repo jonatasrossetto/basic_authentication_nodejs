@@ -111,7 +111,7 @@ app.post('/authentication',function(req,res){
                     console.log("WELCOME "+authIsValid.name);
                     let expireDate = new Date(Date.now()+60*1000);
                     console.log('expire date:' + expireDate);
-                    res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate});
+                    res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate, path:"/", domain: 'localhost'});
                     res.send({ message: 'Signed in the first time' });
                 }
                 else
@@ -265,49 +265,5 @@ const checkUserDataOld = function (username, password){
     return {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
 }
 
-// const checkUserData = function (username, password){
-//     console.log('checkUserData with mysql database');
-//     let msg = {error: true, msg: '', id: '', username: '', name: ''};
-//     connection.query(`SELECT * FROM users WHERE login='${username}'`, (err,rows) => {
-//         if(err) throw err;
-//         if (rows.length>0&&rows[0].senha===password) {
-//             console.log('password is ok');
-//             msg = {error: false, msg: '', id: rows[0].id, username: rows[0].login, name: rows[0].name};
-            
-//         } else {
-//             console.log('login not found within DB');
-//             msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
-//         }
-//     })
-//     console.log(msg);
-//     return msg;
-// }
 
-// const validCookieData = function (cookieData){
-//     if (cookieData) {
-//         const id = cookieData.id;
-//         console.log('id: '+id);
-//         for (const user of users) {
-//             console.log(user.userId);
-//             console.log(user.active);
-//             if (user.userId===Number(id)&&user.active===true){
-//                 console.log('cookie true');
-//                 return true;
-//             }
-//         }
-//     }
-//     console.log('cookie false');
-//     return false;
-// }
 
-const newUsernameIsValid = function(newUsername){
-    console.log('newUsernameIsValid');
-    for (const user of users){
-        console.log(user);
-        if (user.login===newUsername) {
-            return false;
-        } else {
-            return true;
-        }
-    } 
-}
