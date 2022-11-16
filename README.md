@@ -11,14 +11,15 @@ if the cookie exists the the server will test its validity.
 
 next tasks
 - server/client implement try/catch structures to error handling
+- server implement a log for all authentication events
+- use typescript
+- +/- server/client refactor the authentication endpoint using specific methods
 - OK client login data validation before send to server (must not contain ":")
 - OK client display server message within login page
 - OK cookie expires after a pre-set period
 - OK server implements an app page end point with the cookie testing policy
 - OK client remove javascript code from the login html file
-- +/- server/client refactor the authentication endpoint using specific methods
 - OK server looks for user login data in a database
-- server validates cookie user data connecting with the DB
+- OK server validates cookie user data connecting with the DB
 - OK server/client implements a sign on page and link it to a server database
-- server implement a log for all authentication events
-- use typescript
+
