@@ -97,5 +97,25 @@ async function getUserinfo(username, password) {
     return msg;
 }
 
+async function addUser(userData){
+    console.log('addUser with mysql database');
+    console.log(userData);
+    let msg={message:'username already exist'};
+    const conn = await connect();
+    const [rows] = await conn.query(`SELECT * FROM users WHERE login='${userData.username}'`);
+    console.log('rows.length: ',rows.length);
+    if (rows.length<1){
+        console.log('inserting a new user');
+        await conn.query(`INSERT INTO users (name, login, senha, active) VALUES ('${userData.name}','${userData.username}','${userData.password}',false)`);
+        msg={message:'new user created'};
+        console.log('end addUser');
+        return msg;
+    } else {
+        console.log('end addUser');
+        return msg;
+    }
+    
+}
 
-module.exports = {getUsers, checkUserData, validCookieData}
+
+module.exports = {getUsers, checkUserData, validCookieData, addUser}

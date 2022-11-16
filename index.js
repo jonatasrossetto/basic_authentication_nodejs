@@ -191,27 +191,26 @@ app.get('/signup',function(req,res){
 
 app.post('/register',function(req,res){
     console.log('register service');
+    const db = require("./db");
     let cookieStuff=req.signedCookies.user;
     console.log('cookieStuff:');
     console.log(cookieStuff);
-    if (validCookieData(cookieStuff))//True for our case
-    {
-        console.log('hey hey appWelcome');
-        res.sendFile(__dirname +'/appWelcome.html');
-    } else {
-        if (newUsernameIsValid(req.body.username)){
-            users.push({
-                userId: users[users.length-1].userId+1,
-                name:req.body.name,
-                login:req.body.username,
-                password:req.body.password,
-                active:false
+    if (cookieStuff){
+            console.log('begin validCookieData');
+            const cookieIsValid = db.validCookieData(cookieStuff).then((validCookieDataResponse)=>{
+                console.log('validCookieDataResponse:',validCookieDataResponse);
+                if(validCookieDataResponse.isValid) {
+                    console.log('The cookie info is OK');
+                    res.sendFile(__dirname +'/appWelcome.html');
+                }
             });
-            res.send({ message: 'register ok' });
         } else {
-            res.send({ message: 'username already exist' });    
+            console.log('trying to create a new user');
+            db.addUser(req.body).then((response)=>{
+                console.log(response);
+                res.send(response); 
+            });
         }
-    }
 });
 
 app.post('/userInfo',function(req,res){

@@ -24,7 +24,10 @@ submit.addEventListener('click',function(e){
                 }})
                 .then(response=>response.json())
                 .then(data=>{
-                    message.textContent = data.message; 
+                    message.textContent = data.message;
+                    if (data.message=='new user created') {
+                        
+                    }
                     console.log(data.message);
                 });
             } else {
