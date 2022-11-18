@@ -102,35 +102,30 @@ async function getUserinfo(username, password) {
 
 async function addUser(userData){
     const bcrypt = require("bcrypt");
-
-    console.log('addUser with mysql database');
-    console.log(userData);
-    console.log('password: ', userData.password);
     
-    let msg={message:'username already exist'};
-    const conn = await connect();
-    const [rows] = await conn.query(`SELECT * FROM users WHERE login='${userData.username}'`);
-    console.log('rows.length: ',rows.length);
-
-    if (rows.length<1){
-        let hashPassword='';
-        bcrypt.hash(userData.password, 10, function(err, hash) {
-            console.log('hash: ',hash);
-            hashPassword=hash;
+        console.log('addUser with mysql database');
+        console.log(userData);
+        console.log('password: ', userData.password);
+        let msg={message: 'username already exist'};
+        console.log('msg: ',msg);
+        const conn =  await connect();
+        const [rows] =  await conn.query(`SELECT * FROM users WHERE login='${userData.username}'`);
+        console.log('rows.length: ',rows.length);
+        if (rows.length<1){
+            console.log('before hashing the password');
+            const hashPassword = await bcrypt.hash(userData.password, 10);
+            console.log('hash: ',hashPassword);
             console.log('inserting a new user');
-        conn.query(`INSERT INTO users (name, login, senha, active) VALUES ('${userData.name}','${userData.username}','${hashPassword}',false)`);
-        msg={message:'new user created'};
-        console.log('end addUser');
+            const query = await conn.query(`INSERT INTO users (name, login, senha, active) VALUES ('${userData.name}','${userData.username}','${hashPassword}',false)`);
+            msg={message: 'new user created'};
+            console.log('msg: ',msg);
+            console.log('end addUser');
+        } else {
+            console.log('end addUser');
+            console.log('msg: ',msg);
+        }
         return msg;
-        })
-        
-        
-        
-    } else {
-        console.log('end addUser');
-        return msg;
-    }
-    
+
 }
 
 

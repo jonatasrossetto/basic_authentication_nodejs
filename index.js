@@ -209,9 +209,9 @@ app.post('/register',function(req,res){
             });
         } else {
             console.log('trying to create a new user');
-            db.addUser(req.body).then((response)=>{
-                console.log(response);
-                res.send(response); 
+            const resp = db.addUser(req.body).then((response)=>{
+                console.log('add User response: ',response);
+                res.send({message:response.message}); 
             });
         }
 });

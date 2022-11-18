@@ -32,11 +32,11 @@ submit.addEventListener('click',function(e){
                 }})
                 .then(response=>response.json())
                 .then(data=>{
+                    console.log('data.message: ',data.message);
                     message.textContent = data.message;
                     if (data.message=='new user created') {
                         window.location.href = 'http://localhost:3000/';    
                     }
-                    console.log(data.message);
                 });
             } else {
                 message.textContent='failed to confirm password';
