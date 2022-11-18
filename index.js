@@ -7,7 +7,8 @@ const app = express();
 app.use(express.static(__dirname + '/public'));
 // apply bodyParser to all incomming calls
 app.use(bodyParser.urlencoded({extended:true}));
-// apply cookie-parser to incomming calls and decode using the secre key
+// apply cookie-parser to incomming calls and decode using the secret key
+// this secret key must be stored in a configuration file such as config.json
 app.use(cookieParser('secret_key'));
 app.use(express.json());
 
@@ -112,7 +113,7 @@ app.post('/authentication',function(req,res){
                 if(!authIsValid.error) 
                 {
                     console.log("WELCOME "+authIsValid.name);
-                    let expireDate = new Date(Date.now()+60*1000);
+                    let expireDate = new Date(Date.now()+5*60*1000);
                     console.log('expire date:' + expireDate);
                     res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate, path:"/", domain: 'localhost',httpOnly:true});
                     res.send({ message: 'Signed in the first time' });
@@ -211,7 +212,8 @@ app.post('/register',function(req,res){
             console.log('trying to create a new user');
             const resp = db.addUser(req.body).then((response)=>{
                 console.log('add User response: ',response);
-                res.send({message:response.message}); 
+                //res.send({message:response.message}); 
+                res.send(response); 
             });
         }
 });
