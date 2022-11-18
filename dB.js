@@ -21,32 +21,35 @@ async function getUsers(){
 }
 
 async function checkUserData(username, password) {
-    console.log('checkUserData with mysql database');
+    console.log('begin checkUserData with mysql database');
+    const bcrypt = require("bcrypt");
     let msg = {error: true, msg: '', id: '', username: '', name: ''};
     const conn = await connect();
     const [rows] = await conn.query(`SELECT * FROM users WHERE login='${username}'`);
-    
+    console.log(rows.length);
     if (rows.length>0){
-        // console.log('checkUserData rows:');
-        // console.log(rows.length);
-        const userData = rows.pop();
-        // console.log(userData.senha);
-        // console.log(password);
-        // console.log(userData.senha==password);
-        // console.log(rows.length>0);
-        if (userData.senha==password) {
-            console.log('password is ok');
-            // await conn.query(`UPDATE users SET active=true WHERE id='${userData.id}'`);
-            msg = {error: false, msg: '', id: userData.id, username: userData.login, name: userData.name};
-
-        }
+            console.log('start')
+            const userData = rows.pop();
+            console.log(userData);
+            const result = await bcrypt.compare(password,userData.senha);
+            console.log('result: ',result);
+            if (result) {
+                console.log('password is ok');
+                msg = {error: false, msg: '', id: userData.id, username: userData.login, name: userData.name};
+                console.log('end checkUserData with mysql database');
+                return msg;
+            } else {
+                console.log('login not found within DB');
+                msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+                console.log('end checkUserData with mysql database');
+                return msg;
+            }
+        
     } else {
-             console.log('login not found within DB');
-             msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+        msg = {error: true, msg: 'error: login or password incorrect', id: '', username: '', name: ''};
+        console.log('end checkUserData with mysql database');
+        return msg;
     }
-    // console.log('msg');
-    // console.log(msg);
-    return msg;
 }
 
 
@@ -98,18 +101,31 @@ async function getUserinfo(username, password) {
 }
 
 async function addUser(userData){
+    const bcrypt = require("bcrypt");
+
     console.log('addUser with mysql database');
     console.log(userData);
+    console.log('password: ', userData.password);
+    
     let msg={message:'username already exist'};
     const conn = await connect();
     const [rows] = await conn.query(`SELECT * FROM users WHERE login='${userData.username}'`);
     console.log('rows.length: ',rows.length);
+
     if (rows.length<1){
-        console.log('inserting a new user');
-        await conn.query(`INSERT INTO users (name, login, senha, active) VALUES ('${userData.name}','${userData.username}','${userData.password}',false)`);
+        let hashPassword='';
+        bcrypt.hash(userData.password, 10, function(err, hash) {
+            console.log('hash: ',hash);
+            hashPassword=hash;
+            console.log('inserting a new user');
+        conn.query(`INSERT INTO users (name, login, senha, active) VALUES ('${userData.name}','${userData.username}','${hashPassword}',false)`);
         msg={message:'new user created'};
         console.log('end addUser');
         return msg;
+        })
+        
+        
+        
     } else {
         console.log('end addUser');
         return msg;

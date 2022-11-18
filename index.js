@@ -72,6 +72,13 @@ app.get('/',function(req,res){
             res.sendFile(__dirname +'/login.html');
         }
 })
+// set the landing page
+app.post('/logout',function(req,res){
+    console.log('logout service');
+    let expireDate = new Date(Date.now()-1);
+    res.cookie('user','', {signed: true,expires:expireDate, path:"/", domain: 'localhost',httpOnly:true});
+    res.send('user cookie cleared');
+})
 
 // endpoint to implement basic authentication
 app.post('/authentication',function(req,res){
@@ -79,13 +86,11 @@ app.post('/authentication',function(req,res){
     // stores the data from the cookie user, if it exists, deconding it
     let cookieStuff=req.signedCookies.user;
     let authIsValid;
-    console.log('cookieStuff:');
-    console.log(cookieStuff);
+    console.log('cookieStuff:',cookieStuff);
     //But the user is logging in for the first time so there won't be any appropriate signed cookie for usage.
     if(!cookieStuff)//True for our case
     {
-        console.log('req.headers.authorization:')
-        console.log(req.headers.authorization);
+        console.log('req.headers.authorization:',req.headers.authorization);
         let authStuff=req.headers.authorization;
         if(!authStuff)
         {
@@ -97,21 +102,19 @@ app.post('/authentication',function(req,res){
         {
             console.log('recover authentication data');
             const authData = recoverAuthenticationData(authStuff);
-            console.log(authData);
-            (async () => {
+            console.log('authData:',authData);
+            (async ()=>{
+                console.log('begin async');
                 const db = require("./db");
-                console.log('begin checkUserData');
-                authIsValid = await db.checkUserData(authData.username, authData.password);
-                // console.log('authIsValid');
-                // console.log(authIsValid.error);
-                console.log('end checkUserData');
+                const authIsValid = await db.checkUserData(authData.username, authData.password);
+                console.log('authIsValid:',authIsValid);
                 //Extracting the username and password in an array
                 if(!authIsValid.error) 
                 {
                     console.log("WELCOME "+authIsValid.name);
                     let expireDate = new Date(Date.now()+60*1000);
                     console.log('expire date:' + expireDate);
-                    res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate, path:"/", domain: 'localhost'});
+                    res.cookie('user', {id:authIsValid.id,name:authIsValid.name},{signed: true,expires:expireDate, path:"/", domain: 'localhost',httpOnly:true});
                     res.send({ message: 'Signed in the first time' });
                 }
                 else

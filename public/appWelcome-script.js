@@ -15,10 +15,10 @@ const request = fetch('http://localhost:3000/userInfo', {
 
 btnLogout.addEventListener('click',()=>{
     console.log('removing coookie');
-    console.log(document.cookie);
-    document.cookie='user=';
-    window.location.href = 'http://localhost:3000/'
-    console.log(document.cookie);
+    fetch('http://localhost:3000/logout', {method: 'post'}).then((response)=>{
+        console.log(response);
+        window.location.href = 'http://localhost:3000/';
+    });
 })
 
 // welcomeMessage.textContent="Hello Jonatas, this is the App Welcome Page";
