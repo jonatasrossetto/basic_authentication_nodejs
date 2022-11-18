@@ -22,4 +22,7 @@ next tasks
 - OK server looks for user login data in a database
 - OK server validates cookie user data connecting with the DB
 - OK server/client implements a sign on page and link it to a server database
+- OK server hash password before store it in DB (using bcrypt)
+- OK server compares hashed password to authorization (using bcrypt)
+- OK logout, the server clears the user cookie in the client browser
 
