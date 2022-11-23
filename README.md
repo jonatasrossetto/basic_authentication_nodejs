@@ -13,6 +13,9 @@ next tasks
 - server/client implement try/catch structures to error handling
 - server implement a log for all authentication events
 - use typescript
+- use modules and express.route
+- implement https protocol
+- use enviroment variables to hide secrets
 - +/- server/client refactor the authentication endpoint using specific methods
 - OK client login data validation before send to server (must not contain ":")
 - OK client display server message within login page

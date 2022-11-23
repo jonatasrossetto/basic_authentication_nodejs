@@ -12,6 +12,8 @@ async function connect(){
     console.log("Conectou no MySQL!");
     global.connection = connection;
     return connection;
+
+    
 }
 
 async function getUsers(){
